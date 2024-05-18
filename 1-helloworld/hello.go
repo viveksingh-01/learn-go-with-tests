@@ -2,14 +2,17 @@ package main
 
 import "fmt"
 
-func Hello(name string) string {
+func Hello(name string, language string) string {
 	if name == "" {
-		return "Hello, world"
+		name = "world"
+	}
+	if language == "Spanish" {
+		return "Hola, " + name
 	}
 	return "Hello, " + name
 }
 
 func main() {
-	user := "Mike";
-	fmt.Print(Hello(user))
+	user := "Mike"
+	fmt.Print(Hello(user, ""))
 }
