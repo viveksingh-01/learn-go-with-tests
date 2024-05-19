@@ -6,16 +6,21 @@ func Hello(name string, language string) string {
 	if name == "" {
 		name = "world"
 	}
-	if language == "German" {
-		return "Hallo, " + name
+	return getGreetingPrefix(language) + name
+}
+
+func getGreetingPrefix(language string) (prefix string) {
+	switch language {
+	case "French":
+		prefix = "Bonjour, "
+	case "German":
+		prefix = "Hallo, "
+	case "Spanish":
+		prefix = "Hola, "
+	default:
+		prefix = "Hello, "
 	}
-	if language == "French" {
-		return "Bonjour, " + name
-	}
-	if language == "Spanish" {
-		return "Hola, " + name
-	}
-	return "Hello, " + name
+	return
 }
 
 func main() {
