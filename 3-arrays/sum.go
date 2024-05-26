@@ -17,3 +17,15 @@ func SumOfSlice(numbers []int) (sum int) {
 	}
 	return sum
 }
+
+// Go lets us write variadic functions that can take a variable number of arguments.
+func SumAll(numbersToSum ...[]int) []int {
+	lengthOfSlice := len(numbersToSum)
+	// "make" allows you to create a slice with a starting capacity of the length we need to work through.
+	sums := make([]int, lengthOfSlice)
+
+	for i, numbers := range numbersToSum {
+		sums[i] = SumOfSlice((numbers))
+	}
+	return sums
+}
