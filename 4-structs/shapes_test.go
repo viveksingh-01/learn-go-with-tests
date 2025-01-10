@@ -29,4 +29,13 @@ func TestArea(t *testing.T) {
 			t.Errorf("got %g, want %g", got, want)
 		}
 	})
+
+	t.Run("triangle", func(t *testing.T) {
+		triangle := Triangle{12, 6}
+		got := checkArea(triangle)
+		want := 36.0
+		if got != want {
+			t.Errorf("got %f, want %f", got, want)
+		}
+	})
 }

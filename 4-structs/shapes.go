@@ -13,6 +13,11 @@ type Circle struct {
 	Radius float64
 }
 
+type Triangle struct {	
+	Base   float64
+	Height float64
+}
+
 // Instead of defining 2 different methods to calculate Area,
 // we want to be able to write some kind of checkArea function that we can pass 
 // both Rectangles and Circles to, but fail to compile if we try to pass in something that isn't a shape.
@@ -31,8 +36,6 @@ type Shape interface {
 // We can pass in any type that satisfies the Shape interface, like Rectangle or Circle.
 // If we try to pass in something that doesn't satisfy the Shape interface, the Go compiler will throw an error.
 // This is a great way to make sure our code is correct and decoupled.
-
-
 func checkArea(s Shape) float64 {
 	return s.Area()
 }
@@ -43,6 +46,10 @@ func (r Rectangle) Area() float64 {
 
 func (c Circle) Area() float64 {
 	return math.Pi * c.Radius * c.Radius
+}
+
+func (t Triangle) Area() float64 {
+	return 0.5 * t.Base * t.Height
 }
 
 func (r Rectangle) Perimeter() float64 {
@@ -58,4 +65,3 @@ func (c Circle) Perimeter() float64 {
 // For example, the fmt package uses interfaces to print different types of data with the same function.
 // This is why fmt.Println can print a string, an integer, a float, etc.
 // The io package uses interfaces to read and write data from different sources like files, network connections, and in-memory data.
-// 
