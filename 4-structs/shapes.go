@@ -13,13 +13,13 @@ type Circle struct {
 	Radius float64
 }
 
-type Triangle struct {	
+type Triangle struct {
 	Base   float64
 	Height float64
 }
 
 // Instead of defining 2 different methods to calculate Area,
-// we want to be able to write some kind of checkArea function that we can pass 
+// we want to be able to write some kind of checkArea function that we can pass
 // both Rectangles and Circles to, but fail to compile if we try to pass in something that isn't a shape.
 
 // Interfaces are very powerful concept in statically-typed languages like Go.
