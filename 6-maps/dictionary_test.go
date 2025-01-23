@@ -20,6 +20,16 @@ func TestSearch(t *testing.T) {
 	})
 }
 
+func TestAdd(t *testing.T) {
+	dictionary := Dictionary{}
+	dictionary.Add("go", "a fun programming language")
+	got, _ := dictionary.Search("go")
+	want := "a fun programming language"
+	if got != want {
+		t.Errorf("got %q want %q", got, want)
+	}
+}
+
 func assertStrings(t *testing.T, got, want string) {
 	t.Helper()
 	if got != want {
