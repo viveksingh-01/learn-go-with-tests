@@ -2,6 +2,22 @@ package dictionary
 
 import "testing"
 
+func TestAdd(t *testing.T) {
+	dictionary := Dictionary{}
+	word, definition := "go", "a fun programming language"
+	dictionary.Add(word, definition)
+	assertDefinition(t, dictionary, word, definition)
+}
+
+func assertDefinition(t *testing.T, dictionary Dictionary, word, definition string) {
+	t.Helper()
+	got, err := dictionary.Search(word)
+	if err != nil {
+		t.Fatal("should find added word", err)
+	}
+	assertStrings(t, got, definition)
+}
+
 func TestSearch(t *testing.T) {
 	dictionary := Dictionary{"test": "this is just a test"}
 
@@ -18,16 +34,6 @@ func TestSearch(t *testing.T) {
 		}
 		assertError(t, err, ErrNotFound)
 	})
-}
-
-func TestAdd(t *testing.T) {
-	dictionary := Dictionary{}
-	dictionary.Add("go", "a fun programming language")
-	got, _ := dictionary.Search("go")
-	want := "a fun programming language"
-	if got != want {
-		t.Errorf("got %q want %q", got, want)
-	}
 }
 
 func assertStrings(t *testing.T, got, want string) {
