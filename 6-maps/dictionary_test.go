@@ -1,21 +1,25 @@
 package dictionary
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestAdd(t *testing.T) {
-	dictionary := Dictionary{}
-	word, definition := "go", "a fun programming language"
-	dictionary.Add(word, definition)
-	assertDefinition(t, dictionary, word, definition)
-}
 
-func assertDefinition(t *testing.T, dictionary Dictionary, word, definition string) {
-	t.Helper()
-	got, err := dictionary.Search(word)
-	if err != nil {
-		t.Fatal("should find added word", err)
-	}
-	assertStrings(t, got, definition)
+	t.Run("new word", func(t *testing.T) {
+		dictionary := Dictionary{}
+		word, definition := "go", "a fun programming language"
+		err := dictionary.Add(word, definition)
+		assertError(t, err, nil)
+		assertDefinition(t, dictionary, word, definition)
+	})
+
+	t.Run("existing word", func(t *testing.T) {
+		word, definition, newDefinition := "go", "a fun programming language", "good for Gophers"
+		dictionary := Dictionary{word: definition}
+		err := dictionary.Add(word, newDefinition)
+		assertError(t, err, ErrWordExists)
+	})
 }
 
 func TestSearch(t *testing.T) {
@@ -34,6 +38,15 @@ func TestSearch(t *testing.T) {
 		}
 		assertError(t, err, ErrNotFound)
 	})
+}
+
+func assertDefinition(t *testing.T, dictionary Dictionary, word, definition string) {
+	t.Helper()
+	got, err := dictionary.Search(word)
+	if err != nil {
+		t.Fatal("should find added word", err)
+	}
+	assertStrings(t, got, definition)
 }
 
 func assertStrings(t *testing.T, got, want string) {
