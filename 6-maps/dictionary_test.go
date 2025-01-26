@@ -5,7 +5,6 @@ import (
 )
 
 func TestAdd(t *testing.T) {
-
 	t.Run("new word", func(t *testing.T) {
 		dictionary := Dictionary{}
 		word, definition := "go", "a fun programming language"
@@ -13,24 +12,37 @@ func TestAdd(t *testing.T) {
 		assertError(t, err, nil)
 		assertDefinition(t, dictionary, word, definition)
 	})
-
 	t.Run("existing word", func(t *testing.T) {
-		word, definition, newDefinition := "go", "a fun programming language", "good for Gophers"
+		word, definition, newDefinition := "go", "a fun programming language", "loved by Gophers"
 		dictionary := Dictionary{word: definition}
 		err := dictionary.Add(word, newDefinition)
 		assertError(t, err, ErrWordExists)
 	})
 }
 
+func TestUpdate(t *testing.T) {
+	t.Run("new word", func(t *testing.T) {
+		dictionary := Dictionary{}
+		word, definition := "test", "this is just a test"
+		err := dictionary.Update(word, definition)
+		assertError(t, err, ErrWordDoesNotExist)
+	})
+	t.Run("existing word", func(t *testing.T) {
+		word, definition, newDefinition := "test", "this is just a test", "new definition"
+		dictionary := Dictionary{word: definition}
+		err := dictionary.Update(word, newDefinition)
+		assertError(t, err, nil)
+		assertDefinition(t, dictionary, word, newDefinition)
+	})
+}
+
 func TestSearch(t *testing.T) {
 	dictionary := Dictionary{"test": "this is just a test"}
-
 	t.Run("known word", func(t *testing.T) {
 		got, _ := dictionary.Search("test")
 		want := "this is just a test"
 		assertStrings(t, got, want)
 	})
-
 	t.Run("unknown word", func(t *testing.T) {
 		_, err := dictionary.Search("unknown")
 		if err == nil {
