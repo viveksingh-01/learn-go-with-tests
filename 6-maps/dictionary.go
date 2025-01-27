@@ -47,3 +47,8 @@ func (d Dictionary) Update(word, newDefinition string) error {
 		return err
 	}
 }
+
+func (d Dictionary) Delete(word string) error {
+	delete(d, word)
+	return nil
+}
