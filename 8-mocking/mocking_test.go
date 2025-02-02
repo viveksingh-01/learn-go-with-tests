@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"reflect"
 	"testing"
 )
 
@@ -10,19 +11,31 @@ const expectedCountdown = `3
 1
 Go!`
 
-// If we can mock time.Sleep we can use dependency injection to use it instead of
-// a "real" time.Sleep and then we can spy on the calls to make assertions on them.
 func TestCountdown(t *testing.T) {
-	buffer := &bytes.Buffer{}
-	spySleeper := &SpySleeper{}
-	Countdown(buffer, spySleeper)
-	got := buffer.String()
-	want := expectedCountdown
-	if got != want {
-		t.Errorf("got %q want %q", got, want)
-	}
+	t.Run("sleep before every print", func(t *testing.T) {
+		spySleepPrinter := &SpyCountdownOperations{}
+		Countdown(spySleepPrinter, spySleepPrinter)
+		want := []string{
+			write,
+			sleep,
+			write,
+			sleep,
+			write,
+			sleep,
+			write,
+		}
+		if !reflect.DeepEqual(spySleepPrinter.Calls, want) {
+			t.Errorf("wanted calls %v got %v", want, spySleepPrinter.Calls)
+		}
+	})
 
-	if spySleeper.Calls != 3 {
-		t.Errorf("not enough calls to sleeper, want 3 got %d", spySleeper.Calls)
-	}
+	t.Run("print from 3 to Go!", func(t *testing.T) {
+		buffer := &bytes.Buffer{}
+		Countdown(buffer, &SpyCountdownOperations{})
+		got := buffer.String()
+		want := expectedCountdown
+		if got != want {
+			t.Errorf("want %q got %q", want, got)
+		}
+	})
 }

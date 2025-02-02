@@ -9,33 +9,40 @@ import (
 
 const countdownStart = 3
 const finalWord = "Go!"
+const sleep = "sleep"
+const write = "write"
 
-// If we can mock 'time.Sleep' we can use dependency injection to use it instead of
-// a "real" time.Sleep and then we can spy on the calls to make assertions on them.
-
-// Here, we are creating an interface for Sleeper and then implementing it with
-// DefaultSleeper and SpySleeper. This way, we can use the SpySleeper to spy on
-// the calls to Sleep() and make assertions on them.
 type Sleeper interface {
 	Sleep()
 }
 
 type DefaultSleeper struct{}
 
-type SpySleeper struct {
-	Calls int
+// To improve our tests, we want to keep track of the calls to Sleep and Write in the Countdown function
+// We can do this by creating a SpyCountdownOperations struct
+// that has a slice of strings to keep track of the calls to Sleep and Write
+// We can then implement the Sleep and Write methods on the SpyCountdownOperations struct
+
+// SpyCountdownOperations is a struct that keeps track of the calls to Sleep and Write
+type SpyCountdownOperations struct {
+	Calls []string
 }
 
-// DefaultSleeper implements the Sleeper interface and sleeps for 1 second.
 func (d *DefaultSleeper) Sleep() {
 	time.Sleep(1 * time.Second)
 }
 
-// Spies are a kind of mock which can record how a dependency is used.
-// They can record the arguments sent in, how many times it has been called, etc.
-// In our case, we're keeping track of how many times Sleep() is called so we can check it in our test.
-func (s *SpySleeper) Sleep() {
-	s.Calls++
+// Sleep appends the sleep operation to the Calls slice
+// of the SpyCountdownOperations struct
+func (s *SpyCountdownOperations) Sleep() {
+	s.Calls = append(s.Calls, sleep)
+}
+
+// Write appends the write operation to the Calls slice
+// of the SpyCountdownOperations struct
+func (s *SpyCountdownOperations) Write(p []byte) (n int, err error) {
+	s.Calls = append(s.Calls, write)
+	return
 }
 
 func Countdown(out io.Writer, sleeper Sleeper) {
