@@ -16,30 +16,40 @@ type Sleeper interface {
 	Sleep()
 }
 
-type DefaultSleeper struct{}
+// ConfigurableSleeper is a struct that contains a duration and a sleep function
+// that takes a duration as an argument.
+// This is useful for testing because we can pass a SpyTime struct that records
+// the duration it was called with.
+type ConfigurableSleeper struct {
+	duration time.Duration
+	sleep    func(time.Duration)
+}
 
-// To improve our tests, we want to keep track of the calls to Sleep and Write in the Countdown function
-// We can do this by creating a SpyCountdownOperations struct
-// that has a slice of strings to keep track of the calls to Sleep and Write
-// We can then implement the Sleep and Write methods on the SpyCountdownOperations struct
-
-// SpyCountdownOperations is a struct that keeps track of the calls to Sleep and Write
 type SpyCountdownOperations struct {
 	Calls []string
 }
 
-func (d *DefaultSleeper) Sleep() {
-	time.Sleep(1 * time.Second)
+type SpyTime struct {
+	durationSlept time.Duration
 }
 
-// Sleep appends the sleep operation to the Calls slice
-// of the SpyCountdownOperations struct
+// Sleep calls the sleep function of the ConfigurableSleeper with the duration
+// of the ConfigurableSleeper.
+func (c *ConfigurableSleeper) Sleep() {
+	c.sleep(c.duration)
+}
+
+// This is an implementation of the Sleeper interface.
+// It has a Sleep method that takes a duration and assigns it to the durationSlept field.
+// This is useful for testing because we can check the duration that Sleep was called with.
+func (s *SpyTime) Sleep(duration time.Duration) {
+	s.durationSlept = duration
+}
+
 func (s *SpyCountdownOperations) Sleep() {
 	s.Calls = append(s.Calls, sleep)
 }
 
-// Write appends the write operation to the Calls slice
-// of the SpyCountdownOperations struct
 func (s *SpyCountdownOperations) Write(p []byte) (n int, err error) {
 	s.Calls = append(s.Calls, write)
 	return
@@ -54,6 +64,6 @@ func Countdown(out io.Writer, sleeper Sleeper) {
 }
 
 func main() {
-	sleeper := &DefaultSleeper{}
+	sleeper := &ConfigurableSleeper{1 * time.Second, time.Sleep}
 	Countdown(os.Stdout, sleeper)
 }
