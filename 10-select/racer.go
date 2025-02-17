@@ -6,10 +6,18 @@ import (
 )
 
 func Racer(a, b string) (winner string) {
-	aDuration := measureResponseTime(a)
-	bDuration := measureResponseTime(b)
+	// Instead of testing the speeds of the websites one after another
+	// We should be able to check both at the same time (when Go is great at concurrency)
+	aDurationChannel := make(chan time.Duration)
+	bDurationChannel := make(chan time.Duration)
+	go func() {
+		aDurationChannel <- measureResponseTime(a)
+	}()
+	go func() {
+		bDurationChannel <- measureResponseTime(b)
+	}()
 
-	if aDuration < bDuration {
+	if <-aDurationChannel < <-bDurationChannel {
 		return a
 	}
 	return b

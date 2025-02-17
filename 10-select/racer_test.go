@@ -8,13 +8,9 @@ import (
 )
 
 func TestRacer(t *testing.T) {
-	slowServer := makeDelayedServer(20 * time.Millisecond)
-	fastServer := makeDelayedServer(0 * time.Millisecond)
+	slowServer := makeDelayedServer(5 * time.Second)
+	fastServer := makeDelayedServer(2 * time.Second)
 
-	// Sometimes we need to clean up resources, such as closing a file or in our case
-	// closing a server so that it does not continue to listen to a port.
-	// By prefixing a function call with defer it will now call that function at
-	// the end of the containing function.
 	defer slowServer.Close()
 	defer fastServer.Close()
 
