@@ -1,50 +1,35 @@
 package racer
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 )
 
-// We will further refactor and synchronize our code
-// Since, we don't really care about the exact response times of the requests,
-// we just want to know which one comes back first.
-
-// To do this, we're going to introduce a new construct called 'select'
-// which helps us synchronise processes really easily and clearly.
-func Racer(a, b string) (winner string) {
-	// select allows us to wait on multiple channels.
-	// The first one to send a value "wins" and the code underneath the case is executed.
+func Racer(a, b string) (winner string, error error) {
 	select {
-	// We use ping in our select to set up two channels, one for each of our URLs.
-	// Whichever one writes to its channel first will have its code executed in the select,
-	// which results in its URL being returned (and being the winner).
 	case <-ping(a):
-		return a
+		return a, nil
 	case <-ping(b):
-		return b
+		return b, nil
+	case <-time.After(10 * time.Second):
+		return "", fmt.Errorf("timed out waiting for %s and %s", a, b)
 	}
+	// time.After is a very handy function when using select.
+	// Although it didn't happen in our case, we can potentially write code that blocks forever
+	// if the channels you're listening on never return a value. time.After returns a chan (like ping)
+	// and will send a signal down it after the amount of time you define.
+
+	// For us this is perfect; if a or b manage to return they win, but if we get to 10 seconds
+	// then our time.After will send a signal and we'll return an error.
 }
 
-// We have defined a function ping which creates a chan struct{} and returns it.
 func ping(url string) chan struct{} {
-	// Why struct{} and not another type like a bool?
-	// a chan struct{} is the smallest data type available from a memory perspective
-	// so we get no allocation versus a bool.
-	// Since we are closing and not sending anything on the chan so we don't need to allocate anything
 	ch := make(chan struct{})
 	// we start a goroutine which will send a signal into that channel once we have completed http.Get(url)
 	go func() {
 		http.Get(url)
-		// In our case, we don't care what type is sent to the channel,
-		// we just want to signal we are done and closing the channel works perfectly!
 		close(ch)
 	}()
 	return ch
 }
-
-// NOTE:
-// Always make channels
-// Notice how we have to use make when creating a channel; rather than say var ch chan struct{}.
-// When you use var the variable will be initialised with the "zero" value of the type.
-// So for string it is "", int it is 0, etc.
-// For channels the zero value is nil and if you try and send to it with <- it will block forever
-// because you cannot send to nil channels
