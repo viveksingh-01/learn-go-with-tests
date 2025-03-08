@@ -6,20 +6,31 @@ import (
 )
 
 func TestWalk(t *testing.T) {
-	expected := []string{"Chris", "London"}
-	x := struct {
-		Name string
-		City string
-	}{"Chris", "London"}
-
-	var got []string
-	callbackFn := func(input string) {
-		got = append(got, input)
+	cases := []struct {
+		Name          string
+		Input         interface{}
+		ExpectedCalls []string
+	}{
+		{
+			"struct with two fields",
+			struct {
+				Name string
+				City string
+			}{"Chris", "London"},
+			[]string{"Chris", "London"},
+		},
 	}
 
-	Walk(x, callbackFn)
+	for _, test := range cases {
+		t.Run(test.Name, func(t *testing.T) {
+			var got []string
+			Walk(test.Input, func(input string) {
+				got = append(got, input)
+			})
 
-	if !reflect.DeepEqual(got, expected) {
-		t.Errorf("got %v, want %v", got, expected)
+			if !reflect.DeepEqual(got, test.ExpectedCalls) {
+				t.Errorf("got %v, want %v", got, test.ExpectedCalls)
+			}
+		})
 	}
 }
