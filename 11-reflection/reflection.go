@@ -3,14 +3,7 @@ package reflection
 import "reflect"
 
 func Walk(x interface{}, fn func(input string)) {
-	val := reflect.ValueOf(x)
-
-	// If the value is a pointer, we need to get the value it points to.
-	// This is because we can't call NumField on a pointer.
-	// We can use Elem() to get the value the pointer points to.
-	if val.Kind() == reflect.Pointer {
-		val = val.Elem()
-	}
+	val := getValue(x)
 
 	// val has a method NumField which returns the number of fields in the value.
 	// This lets us iterate over the fields and call fn which passes our test.
@@ -26,4 +19,12 @@ func Walk(x interface{}, fn func(input string)) {
 			Walk(field.Interface(), fn)
 		}
 	}
+}
+
+func getValue(x any) reflect.Value {
+	val := reflect.ValueOf(x)
+	if val.Kind() == reflect.Pointer {
+		val = val.Elem()
+	}
+	return val
 }
