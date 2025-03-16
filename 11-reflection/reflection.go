@@ -11,7 +11,7 @@ func Walk(x interface{}, fn func(input string)) {
 		for i := range val.NumField() {
 			Walk(val.Field(i).Interface(), fn)
 		}
-	case reflect.Slice:
+	case reflect.Slice, reflect.Array:
 		// Len returns the number of elements in the slice.
 		for i := range val.Len() {
 			Walk(val.Index(i).Interface(), fn)
