@@ -16,6 +16,11 @@ func Walk(x interface{}, fn func(input string)) {
 		for i := range val.Len() {
 			Walk(val.Index(i).Interface(), fn)
 		}
+	case reflect.Map:
+		// MapKeys returns a slice containing all the keys present in the map, in unspecified order.
+		for _, key := range val.MapKeys() {
+			Walk(val.MapIndex(key).Interface(), fn)
+		}
 	case reflect.String:
 		fn(val.String())
 	}
